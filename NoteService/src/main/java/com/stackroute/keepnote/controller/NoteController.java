@@ -1,5 +1,19 @@
 package com.stackroute.keepnote.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.stackroute.keepnote.exception.NoteAlreadyExistsException;
+import com.stackroute.keepnote.model.Category;
+import com.stackroute.keepnote.model.Note;
 import com.stackroute.keepnote.service.NoteService;
 
 /*
@@ -10,6 +24,7 @@ import com.stackroute.keepnote.service.NoteService;
  * format. Starting from Spring 4 and above, we can use @RestController annotation which 
  * is equivalent to using @Controller and @ResposeBody annotation
  */
+@RestController
 public class NoteController {
 
 	/*
@@ -17,8 +32,10 @@ public class NoteController {
 	 * autowiring) Please note that we should not create any object using the new
 	 * keyword
 	 */
-
+	@Autowired
+	private NoteService noteService;
 	public NoteController(NoteService noteService) {
+		this.noteService = noteService;
 	}
 
 	/*
@@ -31,6 +48,20 @@ public class NoteController {
 	 * 
 	 * This handler method should map to the URL "/api/v1/note" using HTTP POST method
 	 */
+	@PostMapping("api/v1/note")
+	public ResponseEntity<?> createNote(@RequestBody Note note) {
+			try{
+				
+			if(noteService.createNote(note))
+				return new ResponseEntity<Note>(note, HttpStatus.CREATED);
+			else {
+				return new ResponseEntity<Note>(note, HttpStatus.CONFLICT);
+			}
+			}
+			catch(Exception e) {
+				return new ResponseEntity<Note>(note, HttpStatus.CONFLICT);
+			}
+	}
 
 	/*
 	 * Define a handler method which will delete a note from a database.
@@ -42,6 +73,19 @@ public class NoteController {
 	 * This handler method should map to the URL "/api/v1/note/{id}" using HTTP Delete
 	 * method" where "id" should be replaced by a valid noteId without {}
 	 */
+	@DeleteMapping("/api/v1/note/{userid}/{id}")
+	public ResponseEntity<?> deleteNote(@PathVariable("userid") String userId, @PathVariable("id") int Id) {
+		try {
+			if(noteService.deleteNote(userId,Id))
+				return new ResponseEntity<Note>(HttpStatus.OK);
+			else {
+				return new ResponseEntity<Note>(HttpStatus.NOT_FOUND);
+			}
+		}
+		catch(Exception e) {
+			return new ResponseEntity<Note>(HttpStatus.NOT_FOUND);
+		}
+	}
 
 	/*
 	 * Define a handler method which will update a specific note by reading the
@@ -54,6 +98,15 @@ public class NoteController {
 	 * 
 	 * This handler method should map to the URL "/api/v1/note/{id}" using HTTP PUT method.
 	 */
+	@PutMapping("/api/v1/note/{userid}/{id}")
+	public ResponseEntity<?> updateUser(@PathVariable("id") int id,@PathVariable("userid") String userId, @RequestBody Note note){
+		try {
+			noteService.updateNote(note, id, userId);
+			return new ResponseEntity<Note>(HttpStatus.OK);
+		}catch(Exception e) {
+			return new ResponseEntity<Note>(HttpStatus.NOT_FOUND);
+		}
+	}
 	
 	/*
 	 * Define a handler method which will get us the all notes by a userId.
@@ -63,6 +116,14 @@ public class NoteController {
 	 * 
 	 * This handler method should map to the URL "/api/v1/note" using HTTP GET method
 	 */
+
+	@GetMapping("/api/v1/note/{id}")
+	public ResponseEntity<?> getCategoryById(@PathVariable("id") String id) {
+		
+			noteService.getAllNoteByUserId(id);
+			return new ResponseEntity<Note>(HttpStatus.OK);
+		
+	}
 	
 	/*
 	 * Define a handler method which will show details of a specific note created by specific 
@@ -74,6 +135,33 @@ public class NoteController {
 	 * where "id" should be replaced by a valid reminderId without {}
 	 * 
 	 */
-
+	@GetMapping("/api/v1/note/{userId}/{noteId}")
+	public ResponseEntity<?> getNoteById(@PathVariable("userId") String userId, @PathVariable("noteId") int noteId){
+		try {
+			noteService.getNoteByNoteId(userId, noteId);
+			return new ResponseEntity<Note>(HttpStatus.OK);
+		}catch(Exception e) {
+			
+			return new ResponseEntity<Note>(HttpStatus.NOT_FOUND);
+		}
+	}
+	
+	/* delete all notes */
+	
+	@DeleteMapping("/api/v1/note/{userid}")
+	public ResponseEntity<?> deleteNote(@PathVariable("userid") String userId) {
+		try {
+		if(noteService.deleteAllNotes(userId))
+				return new ResponseEntity<Note>(HttpStatus.OK);
+		else {
+			return new ResponseEntity<Note>(HttpStatus.NOT_FOUND);
+		}
+	}
+	catch(Exception e) {
+		return new ResponseEntity<Note>(HttpStatus.NOT_FOUND);
+	}
+}
 
 }
+
+

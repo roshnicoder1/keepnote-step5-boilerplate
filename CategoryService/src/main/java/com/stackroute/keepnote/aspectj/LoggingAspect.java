@@ -1,5 +1,9 @@
 package com.stackroute.keepnote.aspectj;
 
+import java.util.Date;
+
+import org.aspectj.lang.annotation.Before;
+
 /* Annotate this class with @Aspect and @Component */
 
 public class LoggingAspect {
@@ -8,4 +12,8 @@ public class LoggingAspect {
 	 * will have all the four aspectJ annotation
 	 * (@Before, @After, @AfterReturning, @AfterThrowing).
 	 */
+	@Before("execution(* com.stackroute.keepnote.controller.*.*(..))")
+	public void logBefore(){
+		System.out.println("@Before:"+new Date());
+	}
 }

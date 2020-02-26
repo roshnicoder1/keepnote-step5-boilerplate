@@ -2,6 +2,8 @@ package com.stackroute.keepnote.model;
 
 import java.util.Date;
 
+import org.springframework.data.annotation.Id;
+
 public class Category {
 
 	/*
@@ -13,44 +15,56 @@ public class Category {
 	 * always initialized with the system date.
 	 */
 
-    public String getCategoryId() {
-        return null;
-    }
-
-    public void setCategoryId(String categoryId) {
-       
-    }
-
-    public String getCategoryName() {
-        return null;
-    }
-
-    public void setCategoryName(String categoryName) {
-        
-    }
-
-    public String getCategoryDescription() {
-        return null;
-    }
-
-    public void setCategoryDescription(String categoryDescription) {
-      
-    }
-
-    public String getCategoryCreatedBy() {
-        return null;
-    }
-
-    public void setCategoryCreatedBy(String categoryCreatedBy) {
-       
-    }
-
-    public Date getCategoryCreationDate() {
-        return null;
-    }
-
-    public void setCategoryCreationDate(Date categoryCreationDate) {
-      
-    }
+	@Id
+	private String categoryId;
+	private String categoryName;
+	private String categoryDescription;
+	private Date categoryCreationDate;
+	private String categoryCreatedBy;
+	public Category() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+	public Category(String categoryId, String categoryName, String categoryDescription, Date categoryCreationDate,
+			String categoryCreatedBy) {
+		super();
+		this.categoryId = categoryId;
+		this.categoryName = categoryName;
+		this.categoryDescription = categoryDescription;
+		this.categoryCreationDate = categoryCreationDate;
+		this.categoryCreatedBy = categoryCreatedBy;
+	}
+	public String getCategoryName() {
+		return categoryName;
+	}
+	public void setCategoryName(String categoryName) {
+		this.categoryName = categoryName;
+	}
+	public String getCategoryDescription() {
+		return categoryDescription;
+	}
+	public void setCategoryDescription(String categoryDescription) {
+		this.categoryDescription = categoryDescription;
+	}
+	public Date getCategoryCreationDate() {
+		return categoryCreationDate;
+	}
+	public void setCategoryCreationDate(Date categoryCreationDate) {
+		this.categoryCreationDate = categoryCreationDate;
+	}
+	public String getCategoryCreatedBy() {
+		return categoryCreatedBy;
+	}
+	public void setCategoryCreatedBy(String categoryCreatedBy) {
+		this.categoryCreatedBy = categoryCreatedBy;
+	}
+	public String getCategoryId() {
+		return categoryId;
+	}
+	public void setCategoryId(String categoryId) {
+		this.categoryId = categoryId;
+	}
+	
+	
 
 }

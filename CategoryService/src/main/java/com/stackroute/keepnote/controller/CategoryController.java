@@ -1,5 +1,22 @@
 package com.stackroute.keepnote.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.stackroute.keepnote.exception.CategoryDoesNoteExistsException;
+import com.stackroute.keepnote.exception.CategoryNotCreatedException;
+import com.stackroute.keepnote.exception.CategoryNotFoundException;
+import com.stackroute.keepnote.model.Category;
+import com.stackroute.keepnote.service.CategoryService;
+
 /*
  * As in this assignment, we are working with creating RESTful web service, hence annotate
  * the class with @RestController annotation.A class annotated with @Controller annotation
@@ -8,6 +25,7 @@ package com.stackroute.keepnote.controller;
  * format. Starting from Spring 4 and above, we can use @RestController annotation which 
  * is equivalent to using @Controller and @ResposeBody annotation
  */
+@RestController
 public class CategoryController {
 
 	/*
@@ -15,6 +33,12 @@ public class CategoryController {
 	 * Constructor-based autowiring) Please note that we should not create any
 	 * object using the new keyword
 	 */
+	@Autowired
+	private CategoryService categoryService;
+	public CategoryController(CategoryService categoryService) {
+		// TODO Auto-generated constructor stub
+		this.categoryService = categoryService;
+	}
 
 	/*
 	 * Define a handler method which will create a category by reading the
@@ -30,6 +54,16 @@ public class CategoryController {
 	 * method".
 	 */
 	
+	@PostMapping("api/v1/category")
+	public ResponseEntity<?> createCategory(@RequestBody Category category) {
+		try {
+			categoryService.createCategory(category);
+			return new ResponseEntity<Category>(category, HttpStatus.CREATED);
+		} catch (CategoryNotCreatedException e) {
+			return new ResponseEntity<Category>(category, HttpStatus.CONFLICT);
+		}
+	}
+	
 	/*
 	 * Define a handler method which will delete a category from a database.
 	 * 
@@ -41,7 +75,16 @@ public class CategoryController {
 	 * This handler method should map to the URL "/api/v1/category/{id}" using HTTP Delete
 	 * method" where "id" should be replaced by a valid categoryId without {}
 	 */
-
+		
+	@DeleteMapping("/api/v1/category/{id}")
+	public ResponseEntity<?> deleteCategory(@PathVariable("id") String id) {
+		try {
+			categoryService.deleteCategory(id);
+			return new ResponseEntity<>(HttpStatus.OK);
+		} catch (CategoryDoesNoteExistsException e) {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+	}
 	
 	/*
 	 * Define a handler method which will update a specific category by reading the
@@ -54,6 +97,21 @@ public class CategoryController {
 	 * method.
 	 */
 	
+	@PutMapping("/api/v1/category/{id}")
+	public ResponseEntity<?> updateUser(@PathVariable("id") String id, @RequestBody Category category) {
+		try {
+			Category cat1=categoryService.updateCategory(category, id);
+			Category cat= categoryService.getCategoryById(id);
+			if(cat1==cat) {
+			   return new ResponseEntity<Category>(category, HttpStatus.CONFLICT);
+			}else {
+			 return new ResponseEntity<Category>(category, HttpStatus.OK);
+			}
+			}
+			catch(CategoryNotFoundException e) {
+				return new ResponseEntity<Category>(category, HttpStatus.NOT_FOUND);
+			}
+	}
 	/*
 	 * Define a handler method which will get us the category by a userId.
 	 * 
@@ -63,6 +121,18 @@ public class CategoryController {
 	 * 
 	 * This handler method should map to the URL "/api/v1/category" using HTTP GET method
 	 */
-
-
+	
+	
+	@GetMapping("/api/v1/category/{id}")
+	public ResponseEntity<?> getCategoryById(@PathVariable("id") String id) {
+			try {
+				categoryService.getCategoryById(id);
+				return new ResponseEntity<>(HttpStatus.OK);
+			} catch (CategoryNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				return new ResponseEntity<String>("Not Found", HttpStatus.NOT_FOUND);
+			}
+			
+	}
 }
